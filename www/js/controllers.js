@@ -45,15 +45,21 @@ angular.module('starter.controllers', [])
 
   $scope.usuarios = [];
 
-  $http.get('http://localhost:8888/api-prog4/usuario').then(function(resp) {
-    $scope.usuarios = resp.data.data;
-  }, function(err) {
-    console.error('ERR', err);
-    // err.status will contain the status code
-  });  
+  $scope.$on('$ionicView.beforeEnter', function() {
+    
+    $http.get('http://localhost:8888/api-prog4/usuario').then(function(resp) {
+      $scope.usuarios = resp.data.data;
+    }, function(err) {
+      console.error('ERR', err);
+      // err.status will contain the status code
+    });
+
+  });
+
+    
 })
 
-.controller('UsuarioCtrl', function($scope, $stateParams, $http) {
+.controller('UsuarioCtrl', function($scope, $stateParams, $http, $location) {
 
   $scope.usuario = {};
 
@@ -67,12 +73,21 @@ angular.module('starter.controllers', [])
   $scope.doSave = function() {
     $http.put('http://localhost:8888/api-prog4/usuario/'+ $stateParams.UsuarioId, $scope.usuario).then(function(resp) {
       console.log(resp.data);
+      $location.path('/app/usuarios');
     }, function(err) {
       console.error('ERR', err);
       // err.status will contain the status code
     });
+  };
 
-    alert($scope.usuario.name);
+  $scope.doDelete = function() {
+    $http.delete('http://localhost:8888/api-prog4/usuario/'+ $stateParams.UsuarioId, $scope.usuario).then(function(resp) {
+      console.log(resp.data);
+      $location.path('/app/usuarios');
+    }, function(err) {
+      console.error('ERR', err);
+      // err.status will contain the status code
+    });
   };
   
 });

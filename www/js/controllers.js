@@ -41,13 +41,60 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('UsuarioslistsCtrl', function($scope, $http) {
+.controller('HomeCtrl', function($rootScope, $scope, $http) {
+
+  console.log('LoadHome');
+  if($rootScope.user) {
+    $scope.user = $rootScope.user;
+  } else {
+    $scope.user = {};
+    $scope.user.picture = '';
+    $scope.user.name = 'Nombre';
+    $scope.user.email = 'Email';
+    $scope.user.id = '';
+  }
+  
+
+  $scope.doShare = function() {
+    FB.ui({
+      method: 'share',
+      href: 'http://netflix.com/'
+    }, function(response){});
+  };
+
+  $scope.doLogin = function() {
+    FB.login(function(){
+      FB.api('/me?fields=id,name,picture{url},email', 'get', function(data){
+        console.log($scope.user);
+
+        $scope.user.picture = data.picture.data.url;
+        $scope.user.name = data.name;
+        $scope.user.email = data.email;
+        $scope.user.id = data.id;
+        $rootScope.user = $scope.user;
+        $scope.$apply();
+      });
+    }, {scope: 'public_profile, user_friends, email'});
+  };
+
+
+  
+
+    
+})
+
+.controller('UsuarioslistsCtrl', function($rootScope, $scope, $http) {
 
   $scope.usuarios = [];
+  $scope.user = $rootScope.user;
+
+  $scope.$on('$ionicView.enter', function() {
+    console.log('ENTER');
+  });
 
   $scope.$on('$ionicView.beforeEnter', function() {
-    
-    $http.get('http://localhost:8888/api-prog4/usuario').then(function(resp) {
+    console.log('beforeEnter');
+    $http.get('http://api-prog4.herokuapp.com/usuario').then(function(resp) {
       $scope.usuarios = resp.data.data;
     }, function(err) {
       console.error('ERR', err);
@@ -63,7 +110,7 @@ angular.module('starter.controllers', [])
 
   $scope.usuario = {};
 
-  $http.get('http://localhost:8888/api-prog4/usuario/'+ $stateParams.UsuarioId).then(function(resp) {
+  $http.get('http://api-prog4.herokuapp.com/usuario/'+ $stateParams.UsuarioId).then(function(resp) {
     $scope.usuario = resp.data.data;
   }, function(err) {
     console.error('ERR', err);
@@ -71,7 +118,7 @@ angular.module('starter.controllers', [])
   }); 
 
   $scope.doSave = function() {
-    $http.put('http://localhost:8888/api-prog4/usuario/'+ $stateParams.UsuarioId, $scope.usuario).then(function(resp) {
+    $http.put('http://api-prog4.herokuapp.com/usuario/'+ $stateParams.UsuarioId, $scope.usuario).then(function(resp) {
       console.log(resp.data);
       $location.path('/app/usuarios');
     }, function(err) {
@@ -81,7 +128,7 @@ angular.module('starter.controllers', [])
   };
 
   $scope.doDelete = function() {
-    $http.delete('http://localhost:8888/api-prog4/usuario/'+ $stateParams.UsuarioId, $scope.usuario).then(function(resp) {
+    $http.delete('http://api-prog4.herokuapp.com/usuario/'+ $stateParams.UsuarioId, $scope.usuario).then(function(resp) {
       console.log(resp.data);
       $location.path('/app/usuarios');
     }, function(err) {

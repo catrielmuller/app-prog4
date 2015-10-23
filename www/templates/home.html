@@ -1,0 +1,14 @@
+<ion-view view-title="Inicio">
+  <ion-content>
+  	<h1>Inicio</h1>
+  	    <button ng-click="doShare()" class="button button-positive">Facebook Share</button>
+	  	<button ng-hide="user.id" ng-click="doLogin()" class="button button-positive">Facebook Connect</button>
+
+	  	<div ng-show="user.id">
+	  		<h1>{{ user.name }}</h1>
+	  		<p>{{ user.email }}</p>
+	  		<p>{{ user.id }}</p>
+	  		
+	  	</div>
+  </ion-content>
+</ion-view>

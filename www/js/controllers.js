@@ -41,7 +41,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('HomeCtrl', function($rootScope, $scope, $http) {
+.controller('HomeCtrl', function($rootScope, $scope, $http, $cordovaFacebook) {
 
   console.log('LoadHome');
   if($rootScope.user) {
@@ -63,6 +63,29 @@ angular.module('starter.controllers', [])
   };
 
   $scope.doLogin = function() {
+     $cordovaFacebook.login(["public_profile", "email", "user_friends"]).then(function(success) {
+        
+        console.log(success);
+
+        $cordovaFacebook.api("me?fields=id,name,picture{url},email", ["public_profile", "email"]).then(function(data) {
+            console.log(data);
+
+            $scope.user.picture = data.picture.data.url;
+            $scope.user.name = data.name;
+            $scope.user.email = data.email;
+            $scope.user.id = data.id;
+            $rootScope.user = $scope.user;
+            $scope.$apply();
+            
+        }, function (error) {
+          console.log(error);
+        });
+
+      }, function (error) {
+        console.log(error);
+      });
+
+    /* 
     FB.login(function(){
       FB.api('/me?fields=id,name,picture{url},email', 'get', function(data){
         console.log($scope.user);
@@ -75,6 +98,7 @@ angular.module('starter.controllers', [])
         $scope.$apply();
       });
     }, {scope: 'public_profile, user_friends, email'});
+*/
   };
 
 
